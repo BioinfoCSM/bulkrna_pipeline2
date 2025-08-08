@@ -1,0 +1,269 @@
+#==========================#
+#author : BioinfoCSM       #
+#version : v1.0            #
+#==========================#
+
+
+#===import module===
+import pandas as pd
+
+#===config===
+configfile : "config.yaml"
+
+
+#===common===
+raw_dir = config["raw_dir"]
+work_dir = config["work_dir"]
+SAMPLES = pd.read_csv (config["samples"], sep = "\t", header = None, usecols = [1]).squeeze ().tolist ()
+CASE = pd.read_csv (config["contrasts"], sep = "\t", header = None, usecols = [0]).squeeze ().tolist ()
+CTRL = pd.read_csv (config["contrasts"], sep = "\t", header = None, usecols = [1]).squeeze ().tolist ()
+
+#===result===
+rule all : 
+  input : 
+    expand (work_dir + "/ref/genome.hisat2.{i}.ht2", i = list (range (1, 9))),
+    expand (work_dir + "/fastqc/{samples}/{samples}_{i}_fastqc.html", samples = SAMPLES, i = list (range (1, 3))),
+    work_dir + "/quantification/pca_base_cpm.pdf",
+    expand (work_dir + "/diff/{case}_VS_{ctrl}.xls", case = CASE, ctrl = CTRL),
+    expand (work_dir + "/diff/{case}_VS_{ctrl}_volcano.pdf", case = CASE, ctrl = CTRL)
+
+   
+
+#===genome index===
+rule genome_index : 
+  input : 
+    genome = config["genome_index"]["genome"]
+  output : 
+    expand (work_dir + "/ref/genome.hisat2.{i}.ht2", i = list (range (1, 9
+)))
+  threads : config["genome_index"]["threads"]
+  resources : 
+    mem_gb = 2
+  params : 
+    prefix = work_dir + "/ref/genome.hisat2"
+  singularity : config["image"]
+  shell : 
+    """
+    echo start at `date` && \
+
+    hisat2-build \
+    -p {threads} {input.genome} {params.prefix} && \
+
+    echo complete at `date`
+    """
+
+
+#===qc===
+rule qc_fastqc :
+  input :
+    r1 = raw_dir + "/{samples}_1.fastq.gz",
+    r2 = raw_dir + "/{samples}_2.fastq.gz"
+  output :
+    r1_html = work_dir + "/fastqc/{samples}/{samples}_1_fastqc.html",
+    r2_html = work_dir + "/fastqc/{samples}/{samples}_2_fastqc.html"
+  log : work_dir + "/fastqc/{samples}/{samples}.log"
+  threads : config["qc"]["threads"]
+  resources : 
+    mem_gb = 2
+  params :
+    prefix = work_dir + "/fastqc/{samples}"
+  singularity : config["image"]
+  shell :
+    """
+    echo start at `date` && \
+
+    fastqc \
+    -f fastq \
+    -t {threads} \
+    {input.r1} \
+    {input.r2} \
+    -o {params.prefix} \
+    1>{log} 2>&1 && \
+
+    echo complete at `date`
+    """
+
+
+#===filter===
+rule filter_fastp :
+  input :
+    r1 = raw_dir + "/{samples}_1.fastq.gz",
+    r2 = raw_dir + "/{samples}_2.fastq.gz"
+  output :
+    r1 = work_dir + "/cleandata/{samples}/{samples}_1.fastq.gz",
+    r2 = work_dir + "/cleandata/{samples}/{samples}_2.fastq.gz",
+    report = work_dir + "/cleandata/{samples}/{samples}.html",
+    json = work_dir + "/cleandata/{samples}/{samples}.json"
+  threads : config["filter"]["threads"]
+  resources : 
+    mem_gb = 2
+  params :
+    filter_stat_software = work_dir + "/script/filter_stat.py"
+  singularity : config["image"]
+  shell :
+    """
+    echo start at `date` && \
+
+    fastp \
+    -w {threads} \
+    -i {input.r1} \
+    -I {input.r2} \
+    -o {output.r1} \
+    -O {output.r2} \
+    -h {output.report} \
+    -j {output.json} && \
+    python {params.filter_stat_software} && \
+
+    echo complete at `date`
+    """
+
+
+#===alignment===
+rule align_hisat2 :
+  input :
+    r1 = work_dir + "/cleandata/{samples}/{samples}_1.fastq.gz",
+    r2 = work_dir + "/cleandata/{samples}/{samples}_2.fastq.gz",
+    index = expand (work_dir + "/ref/genome.hisat2.{i}.ht2", i = list (range (1, 9)))
+  output :
+    sam = temp (work_dir + "/alignment/{samples}/{samples}.sam"),
+  log : work_dir + "/alignment/{samples}/{samples}.log"
+  threads : config["alignment"]["threads"]
+  resources :
+    mem_gb = 2
+  params :
+    strandness = config["alignment"]["strandness"],
+    prefix = work_dir + "/ref/genome.hisat2",
+    alignment_stat_software = work_dir + "/script/alignment_stat.py"
+  singularity : config["image"]
+  shell :
+    """
+    echo start at `date` && \
+
+    hisat2 \
+    -p {threads} \
+    -x {params.prefix} \
+    -1 {input.r1} \
+    -2 {input.r2} \
+    --new-summary --rna-strandness {params.strandness} \
+    -S {output.sam} \
+    1>{log} 2>&1 && \
+    python {params.alignment_stat_software} && \
+
+    echo complete at `date`
+    """
+
+rule sam2bam :
+  input :
+    sam = work_dir + "/alignment/{samples}/{samples}.sam"
+  output :
+    bam = protected (work_dir + "/alignment/{samples}/{samples}.bam")
+  threads : config["sam2bam"]["threads"]
+  resources : 
+    mem_gb = 2
+  singularity : config["image"]
+  shell :
+    """
+    echo start at `date` && \
+
+    samtools sort \
+    -@ {threads} \
+    -o {output.bam} \
+    {input.sam} && \
+    /home/zhaolab/chengsiming/miniconda3/envs/lnc_rna/bin/samtools index \
+    -@ {threads} {output.bam} && \
+
+    echo complete at `date`
+    """
+
+
+#===quantification===
+rule quanti_featureCounts :
+  input :
+    bam_file = expand (work_dir + "/alignment/{samples}/{samples}.bam", samples = SAMPLES),
+    gtf = config["genome_index"]["gtf"]
+  output :
+    counts = work_dir + "/quantification/gene_count.xls",
+    cpm = work_dir + "/quantification/gene_cpm.xls"
+  threads : config["quanti"]["threads"]
+  resources : 
+    mem_gb = 2
+  params :
+    featureCounts = work_dir + "/script/featureCounts.R",
+    bam_list = work_dir + "/quantification/bam_list",
+    feturetype = config["quanti"]["featuretype"],
+    attritype = config["quanti"]["attritype"],
+    ispairend = config["quanti"]["ispairend"],
+    strandness = config["quanti"]["strandness"],
+    outpre = work_dir + "/quantification"
+  singularity : config["image"]
+  shell :
+    """
+    echo start at `date` && \
+
+    ls {input.bam_file} > {params.bam_list} && \
+    Rscript \
+    {params.featureCounts} -b {params.bam_list} \
+    -g {input.gtf} -f {params.feturetype} \
+    -a {params.attritype} -i {params.ispairend} \
+    -s {params.strandness} -t {threads} -o {params.outpre} && \
+    sed -i \'s/\.bam//g\' {output.counts} && \
+    sed -i \'s/\.bam//g\' {output.cpm} && \
+    rm {params.bam_list} && \
+
+    echo complete at `date`
+    """
+
+
+rule pca_plot :
+  input :
+    cpm = work_dir + "/quantification/gene_cpm.xls",
+    sample_info = config["samples"]
+  output :
+    pca = work_dir + "/quantification/pca_base_cpm.pdf"
+  resources : 
+    mem_gb = 2
+  params :
+    outpre = work_dir + "/quantification",
+    pca_software = work_dir + "/script/pca.R"
+  singularity : config["image"]
+  shell :
+    """
+    echo start at `date` && \
+
+    Rscript \
+    {params.pca_software} \
+    --gene_cpm {input.cpm} --sample_info {input.sample_info} \
+    --outpre {params.outpre} && \
+
+    echo complete at `date`
+    """
+
+
+#===diff===
+rule diff_deseq2 :
+  input :
+    counts = work_dir + "/quantification/gene_count.xls",
+    sample_info = config["samples"],
+    contrast = config["contrasts"]
+  output :
+    de_result = work_dir + "/diff/{case}_VS_{ctrl}.xls",
+    volcano = work_dir + "/diff/{case}_VS_{ctrl}_volcano.pdf"
+  resources : 
+    mem_gb = 2
+  params :
+    diff_software = work_dir + "/script/diff.R",
+    outpre = work_dir + "/diff"
+  singularity : config["image"]
+  shell :
+    """
+    echo start at `date` && \
+
+    Rscript \
+    {params.diff_software} \
+    --gene_count {input.counts} \
+    --sample_info {input.sample_info} \
+    --contrast {input.contrast} \
+    --outpre {params.outpre} && \
+
+    echo complete at `date`
+    """

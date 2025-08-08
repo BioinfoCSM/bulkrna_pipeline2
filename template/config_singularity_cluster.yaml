@@ -1,0 +1,36 @@
+#===common params===
+raw_dir : "bulkrna_pipeline2/rawdata"
+work_dir : "bulkrna_pipeline2"
+image : "image/bulkrna_v1.0.sif"
+samples : "bulkrna_pipeline2/samples.txt"
+contrasts : "bulkrna_pipeline2/contrasts.txt"
+
+#===genome index===
+genome_index :
+  genome : "bulkrna_pipeline2/ref/genome.fa" 
+  gtf : "bulkrna_pipeline2/ref/genes.gtf"
+  threads : 2
+
+#===qc params===
+qc :
+  threads : 2
+
+#===filter params===
+filter :
+  threads : 2
+
+#===alignment params===
+alignment :
+  strandness : "F"
+  threads : 4
+sam2bam : 
+  threads : 4
+
+#===quantification===
+quanti :
+  featuretype : "exon"
+  attritype : "gene_id"
+  ispairend : "TRUE"
+  strandness : 0
+  threads : 2
+        
