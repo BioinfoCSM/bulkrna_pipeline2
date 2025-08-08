@@ -19,7 +19,7 @@ class all :
       os.system (f"cp {os.path.dirname (__file__)}/template/Snakefile_singularity_cluster {os.path.dirname (__file__)}/Snakefile")
       os.system (f"cp {os.path.dirname (__file__)}/template/submit_singularity_cluster.sh {os.path.dirname (__file__)}/submit.sh")
     else : 
-      print ("no")
+      print ("updating...")
 
 
 if __name__ == "__main__" : 
