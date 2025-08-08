@@ -62,5 +62,5 @@ cat logs/*out
 ```
 ***
 # Info
-* Author:BioinfoCSM(SiMing Cheng)
+* Author:BioinfoCSM(Siming Cheng)
 * Email:simoncheng158@gmail.com
