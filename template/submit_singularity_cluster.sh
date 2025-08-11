@@ -6,10 +6,6 @@ if [ -e "image/BulkRNA.sif" ] && [ -e "ref/genome.fa" ] && [ -e "ref/genes.gtf" 
 	--latency-wait 100 \
 	--use-singularity \
 	--cluster \
-	-F \
-	--until \
-	--ri \
-	--keep-going \
 	"sbatch \
 	--job-name={rule} \
 	--partition=cpu \
@@ -19,6 +15,10 @@ if [ -e "image/BulkRNA.sif" ] && [ -e "ref/genome.fa" ] && [ -e "ref/genes.gtf" 
 	--mem={resources.mem_gb}G \
 	--error=logs/{rule}_%j.err \
 	--output=logs/{rule}_%j.out" \
+	-F \
+        --until \
+        --ri \
+        --keep-going \
 	--jobs 100 \
 	-s Snakefile \
 1>snakemake.log 2>&1 && \

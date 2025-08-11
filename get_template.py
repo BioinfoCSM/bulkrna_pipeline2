@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 # coding=utf-8
 
+__author__ = "BioinfoCSM"
+__version__ = "1.0"
+
 import os
 import argparse
 
