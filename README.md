@@ -53,7 +53,7 @@ vi submit.sh
 ```shell
 nohup sh submit.sh 1>submit.log 2>&1 &
 ```
-## Check the log file when tasks completed
+## Check the log file when all tasks are completed
 ```shell
 #notes:you can see the information such as "complete at..." while all of jobs successfully
 cat submit.log
