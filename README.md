@@ -4,7 +4,7 @@
 - 📌 Singularity=3.5.2
 - 🎆 Python=3.13.5
 - 🎉 R=4.4.3
-- ***
+***
 # Description
 * A bulkrna-seq pipeline base on [snakemake](https://snakemake.readthedocs.io/en/stable/) workflow that able to complete primary analysis.
 * [Singularity](https://sylabs.io/singularity/) is supported in pipeline.
