@@ -1,5 +1,5 @@
 echo "===file check and running==="
-if [ -e "image/BulkRNA.sif" ] && [ -e "ref/genome.fa" ] && [ -e "ref/genes.gtf" ] ; then 
+if [ -e "image/bulkrna_v1.0.sif" ] && [ -e "ref/genome.fa" ] && [ -e "ref/genes.gtf" ] ; then 
 	echo start at `date` && \
 	mkdir logs && \
 	snakemake \
