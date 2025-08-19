@@ -1,29 +1,31 @@
 #!/usr/bin/env python3
 # coding=utf-8
 
-__author__ = "BioinfoCSM"
-__version__ = "0.1"
-
 import os
 import argparse
 
-parser = argparse.ArgumentParser (description = "It is a python program for generate template of bulkrna-seq pipeline")
-parser.add_argument ("--singularity", type = int, help = "use singularity or not,0 means 'no',1 means 'yes'", required = False, default = True, choices = [0, 1])
-parser.add_argument ("--mode", type = str, help = "Execute snakemake rule with local or cluster mode", required = False, default = "cluster", choices = ["local", "cluster"])
+parser = argparse.ArgumentParser (description = "help document")
+parser.add_argument ("--use_singularity", action = "store_true", help = "If defined,run job within a apptainer/singularity container", required = False)
+parser.add_argument ("--use_conda", action = "store_true", help = "If defined,run job in a conda/mamba environment", required = False)
+parser.add_argument ("--mode", type = str, help = "mode", required = True, choices = ["local", "cluster"])
 args = parser.parse_args ()
 
 class all :
-  def __init__ (self, singularity, mode) : 
-    self.singularity = singularity
+  def __init__ (self, use_singularity, use_conda, mode) : 
+    self.use_singularity = use_singularity
+    self.use_conda = use_conda
     self.mode = mode
   def get_template (self) : 
-    if self.singularity == 0 and self.mode == "cluster": 
+    if self.use_singularity and self.mode == "cluster" : 
       os.system (f"cp {os.path.dirname (__file__)}/template/config_singularity_cluster.yaml {os.path.dirname (__file__)}/config.yaml")
       os.system (f"cp {os.path.dirname (__file__)}/template/Snakefile_singularity_cluster {os.path.dirname (__file__)}/Snakefile")
       os.system (f"cp {os.path.dirname (__file__)}/template/submit_singularity_cluster.sh {os.path.dirname (__file__)}/submit.sh")
-    else : 
-      print ("updating...")
-
+    elif self.use_conda and self.mode == "local" : 
+      os.system (f"cp {os.path.dirname (__file__)}/template/config_conda_local.yaml {os.path.dirname (__file__)}/config.yaml")
+      os.system (f"cp {os.path.dirname (__file__)}/template/Snakefile_conda_local {os.path.dirname (__file__)}/Snakefile")
+      os.system (f"cp {os.path.dirname (__file__)}/template/submit_conda_local.sh {os.path.dirname (__file__)}/submit.sh")
 
 if __name__ == "__main__" : 
-  all (singularity = args.singularity, mode = args.mode).get_template () 
+  all (use_singularity = args.use_singularity, 
+       use_conda = args.use_conda, 
+       mode = args.mode).get_template () 

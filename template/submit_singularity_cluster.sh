@@ -1,6 +1,7 @@
 echo "===file check and running==="
 if [ -e "image/bulkrna_v1.0.sif" ] && [ -e "ref/genome.fa" ] && [ -e "ref/genes.gtf" ] ; then 
 	echo start at `date` && \
+
 	mkdir logs && \
 	snakemake \
 	--latency-wait 100 \
@@ -15,19 +16,16 @@ if [ -e "image/bulkrna_v1.0.sif" ] && [ -e "ref/genome.fa" ] && [ -e "ref/genes.
 	--mem={resources.mem_gb}G \
 	--error=logs/{rule}_%j.err \
 	--output=logs/{rule}_%j.out" \
-	-F \
-	--until \
-	--ri \
-	--keep-going \
-	--jobs 100 \
+	--jobs 10 \
 	-s Snakefile \
-1>snakemake.log 2>&1 && \
+	1>snakemake.log 2>&1 && \
 
-echo complete at `date`
+	echo complete at `date`
 else 
 	echo "error : image|genome|gtf file no exist"
 	echo """
 you need to :
 1.pull image : singularity pull --arch amd64 library://bioinfocsm/share/bulkrna:v1.0
-2.run command : 'cp path/your_genome.fa' ./ref/ && cp path/your_genes.gtf ./ref/"""
+2.copy : cp path/your_genome.fa ./ref/ && cp path/your_genes.gtf ./ref/
+3.run again : nohup sh submit.sh 1>summit.log 2>&1 &"""
 fi
