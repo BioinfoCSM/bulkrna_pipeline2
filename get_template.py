@@ -24,6 +24,10 @@ class all :
       os.system (f"cp {os.path.dirname (__file__)}/template/config_conda_local.yaml {os.path.dirname (__file__)}/config.yaml")
       os.system (f"cp {os.path.dirname (__file__)}/template/Snakefile_conda_local {os.path.dirname (__file__)}/Snakefile")
       os.system (f"cp {os.path.dirname (__file__)}/template/submit_conda_local.sh {os.path.dirname (__file__)}/submit.sh")
+    elif self.use_singularity and self.mode == "local" :
+      os.system (f"cp {os.path.dirname (__file__)}/template/config_singularity_local.yaml {os.path.dirname (__file__)}/config.yaml")
+      os.system (f"cp {os.path.dirname (__file__)}/template/Snakefile_singularity_local {os.path.dirname (__file__)}/Snakefile")
+      os.system (f"cp {os.path.dirname (__file__)}/template/submit_singularity_local.sh {os.path.dirname (__file__)}/submit.sh")
 
 if __name__ == "__main__" : 
   all (use_singularity = args.use_singularity, 
