@@ -169,7 +169,7 @@ rule sam2bam :
     -@ {threads} \
     -o {output.bam} \
     {input.sam} && \
-    /home/zhaolab/chengsiming/miniconda3/envs/lnc_rna/bin/samtools index \
+    samtools index \
     -@ {threads} {output.bam} && \
 
     echo complete at `date`
