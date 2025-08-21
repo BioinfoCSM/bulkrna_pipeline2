@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 # coding=utf-8
 
+__author__ = "BioinfoCSM"
+__date__ = "2025-8-21"
+
 import os
 import argparse
 
