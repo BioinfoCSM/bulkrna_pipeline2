@@ -2,7 +2,7 @@
 # coding=utf-8
 
 __author__ = "BioinfoCSM"
-__version__ = "0.1"
+__date__ = "2025-8-21"
 
 import os
 import argparse

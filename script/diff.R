@@ -1,8 +1,8 @@
 #!/usr/bin/env Rscript
 
 #=======================#
-#author = "BioinfoCSM"  #
-#version = "0.1"        #
+#author = BioinfoCSM  #
+#date = 2025-8-21        #
 #=======================#
 
 #===load packages===
