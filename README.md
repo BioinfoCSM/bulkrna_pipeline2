@@ -7,8 +7,7 @@
 ***
 # Description
 * A bulkrna-seq pipeline base on [snakemake](https://snakemake.readthedocs.io/en/stable/) workflow that able to complete primary analysis.
-* [Singularity](https://sylabs.io/singularity/) is supported in pipeline.
-* Pipeline supports execution in HPC environments and uses [Slurm](https://slurm.schedmd.com/documentation.html) for job submition and management.
+* Run snakemake rule in flexible ways,include [conda](https://docs.conda.io/en/latest/)/[mamba](https://mamba.readthedocs.io/en/latest/)/ envs or [singularity](https://sylabs.io/docs/)/[apptainer](https://apptainer.org/) container + local/[slurm](https://slurm.schedmd.com/documentation.html).
 * If you use pipeline in your paper don't forget citing the URL of this repository,thanks!<br>
 # Graph of jobs
 ![pipeline](pipeline.png)
@@ -24,13 +23,6 @@ cd bulkrna_pipeline2
 mkdir ref
 cp path/your_reference.fa ref/genome.fa
 cp path/your_annotation.gtf ref/genes.gtf
-#pull a singularity container to bulkrna_pipeline2/image
-mkdir image
-cd image
-singularity pull --arch amd64 library://bioinfocsm/share/bulkrna:v1.0
-or
-singularity pull --arch amd64 library://bioinfocsm/share/bulkrna:sha256.5d3b05d0f6021dacea1d5bd2a411f5c411466feb36fb7a6ff8bed0a2800c6d43
-cd ../
 #copy your rawdata to bulkrna_pipeline2/rawdata,suffix is fastq.gz
 mkdir rawdata
 cp path/your_fastq.fastq.gz rawdata/
@@ -40,9 +32,34 @@ contrasts.txt:case_name\tcontrol_name
 #notes:\t represent tab separate
 ```
 # Usage
-## get pipeline template
+## get template
+view help documentation by execute `python get_template.py -h`
 ```shell
-sh main.sh
+usage: get_template.py [-h] [--use_singularity] [--use_conda] --mode
+                       {local,cluster}
+
+help document
+
+options:
+  -h, --help            show this help message and exit
+  --use_singularity     If defined,run job within a apptainer/singularity
+                        container
+  --use_conda           If defined,run job in a conda/mamba environment
+  --mode {local,cluster}
+                        Execute snakemake rule with local or
+                        cluster(currently,only slurm supported) environment
+```
+and then,run program
+```shell
+python get_template.py [--use_singularity] [--use_conda] --mode {local,cluster}
+```
+note:if `--use_singularity`,pulling the image file is necessary
+```shell
+mkdir image && cd image
+singularity pull --arch amd64 library://bioinfocsm/share/bulkrna:v1.0
+or
+singularity pull --arch amd64 \
+library://bioinfocsm/share/bulkrna:sha256.5d3b05d0f6021dacea1d5bd2a411f5c411466feb36fb7a6ff8bed0a2800c6d43
 ```
 ## modify config.yaml and submit.sh parameters according to your project requirements
 ```shell
