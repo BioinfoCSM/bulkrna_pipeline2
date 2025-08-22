@@ -31,6 +31,24 @@ class all :
       os.system (f"cp {os.path.dirname (__file__)}/template/Snakefile_singularity_cluster {os.path.dirname (__file__)}/Snakefile")
       os.system (f"cp {os.path.dirname (__file__)}/template/submit_singularity_cluster.sh {os.path.dirname (__file__)}/submit.sh")
 
+#===singularity + local===
+    elif self.use_singularity and self.mode == "local" :
+      os.system (f"cp {os.path.dirname (__file__)}/template/config_singularity_local.yaml {os.path.dirname (__file__)}/config.yaml")
+      os.system (f"cp {os.path.dirname (__file__)}/template/Snakefile_singularity_local {os.path.dirname (__file__)}/Snakefile")
+      os.system (f"cp {os.path.dirname (__file__)}/template/submit_singularity_local.sh {os.path.dirname (__file__)}/submit.sh")
+
+#===apptainer + cluster===
+    if self.use_apptainer and self.mode == "cluster" :
+      os.system (f"cp {os.path.dirname (__file__)}/template/config_singularity_cluster.yaml {os.path.dirname (__file__)}/config.yaml")
+      os.system (f"cp {os.path.dirname (__file__)}/template/Snakefile_singularity_cluster {os.path.dirname (__file__)}/Snakefile")
+      os.system (f"cp {os.path.dirname (__file__)}/template/submit_singularity_cluster.sh {os.path.dirname (__file__)}/submit.sh && sed -i 's/--use-singularity/--use-apptainer/g' submit.sh")
+
+#===apptainer + local===
+    elif self.use_apptainer and self.mode == "local" :
+      os.system (f"cp {os.path.dirname (__file__)}/template/config_singularity_local.yaml {os.path.dirname (__file__)}/config.yaml")
+      os.system (f"cp {os.path.dirname (__file__)}/template/Snakefile_singularity_local {os.path.dirname (__file__)}/Snakefile")
+      os.system (f"cp {os.path.dirname (__file__)}/template/submit_singularity_local.sh {os.path.dirname (__file__)}/submit.sh && sed -i 's/--use-singularity/--use-apptainer/g' submit.sh")
+
 #===conda + local===
     elif self.use_conda and self.mode == "local" : 
       os.system (f"cp {os.path.dirname (__file__)}/template/config_conda_local.yaml {os.path.dirname (__file__)}/config.yaml")
@@ -42,12 +60,6 @@ class all :
       os.system (f"cp {os.path.dirname (__file__)}/template/config_conda_local.yaml {os.path.dirname (__file__)}/config.yaml")
       os.system (f"cp {os.path.dirname (__file__)}/template/Snakefile_conda_local {os.path.dirname (__file__)}/Snakefile")
       os.system (f"cp {os.path.dirname (__file__)}/template/submit_conda_local.sh {os.path.dirname (__file__)}/submit.sh && sed -i 's/--conda-frontend conda/--conda-frontend mamba/g' submit.sh")
-
-#===singularity + local===
-    elif self.use_singularity and self.mode == "local" :
-      os.system (f"cp {os.path.dirname (__file__)}/template/config_singularity_local.yaml {os.path.dirname (__file__)}/config.yaml")
-      os.system (f"cp {os.path.dirname (__file__)}/template/Snakefile_singularity_local {os.path.dirname (__file__)}/Snakefile")
-      os.system (f"cp {os.path.dirname (__file__)}/template/submit_singularity_local.sh {os.path.dirname (__file__)}/submit.sh")
 
 #===conda + cluster===
     elif self.use_conda and self.mode == "cluster" :
