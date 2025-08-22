@@ -1,5 +1,5 @@
 echo "===file check and running==="
-if [ -e "envs/bulkrna_env" ] && [ -e "envs/rbase4_env" ] [ -e "ref/genome.fa" ] && [ -e "ref/genes.gtf" ] ; then 
+if [ -e "envs/bulkrna_env" ] && [ -e "envs/rbase4_env" ] && [ -e "ref/genome.fa" ] && [ -e "ref/genes.gtf" ] ; then 
 	echo start at `date` && \
 
 	mkdir logs && \
