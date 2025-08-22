@@ -4,6 +4,7 @@ if [ -e "envs/bulkrna_env.yaml" ] && [ -e "envs/rbase4_env.yaml" ] && [ -e "ref/
 
 	snakemake \
 	--use-conda \
+	--conda-frontend conda \
 	-c 10 \
 	-s Snakefile \
 	1>snakemake.log 2>&1 && \
