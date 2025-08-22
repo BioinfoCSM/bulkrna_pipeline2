@@ -35,8 +35,8 @@ contrasts.txt:case_name\tcontrol_name
 ## get template
 view help documentation by execute `python get_template.py -h`
 ```shell
-usage: get_template.py [-h] [--use_singularity] [--use_conda] --mode
-                       {local,cluster}
+usage: get_template.py [-h] [--use_singularity] [--use_apptainer] [--use_conda]
+                       [--use_mamba] --mode {local,cluster}
 
 help document
 
@@ -44,21 +44,24 @@ options:
   -h, --help            show this help message and exit
   --use_singularity     If defined,run job within a apptainer/singularity
                         container
+  --use_apptainer       If defined,run job within a apptainer/singularity
+                        container
   --use_conda           If defined,run job in a conda/mamba environment
+  --use_mamba           If defined,run job in a conda/mamba environment
   --mode {local,cluster}
                         Execute snakemake rule with local or
                         cluster(currently,only slurm supported) environment
 ```
 and then,run program
 ```shell
-python get_template.py [--use_singularity] [--use_conda] --mode {local,cluster}
+python get_template.py [--use_singularity] [--use_apptainer] [--use_conda] [--use_mamba] --mode {local,cluster}
 ```
-note:if `--use_singularity`,pulling the image file is necessary
+note:if `--use_singularity` or `--use_apptainer`,pulling the image file is necessary
 ```shell
 mkdir image && cd image
-singularity pull --arch amd64 library://bioinfocsm/share/bulkrna:v1.0
+singularity/apptainer pull --arch amd64 library://bioinfocsm/share/bulkrna:v1.0
 or
-singularity pull --arch amd64 \
+singularity/apptainer pull --arch amd64 \
 library://bioinfocsm/share/bulkrna:sha256.5d3b05d0f6021dacea1d5bd2a411f5c411466feb36fb7a6ff8bed0a2800c6d43
 ```
 ## modify config.yaml and submit.sh parameters according to your project requirements
