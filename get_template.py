@@ -8,10 +8,10 @@ import os
 import argparse
 
 parser = argparse.ArgumentParser (description = "help document")
-parser.add_argument ("--use_singularity", action = "store_true", help = "If defined,run job within a apptainer/singularity container", required = False)
-parser.add_argument ("--use_apptainer", action = "store_true", help = "If defined,run job within a apptainer/singularity container", required = False)
-parser.add_argument ("--use_conda", action = "store_true", help = "If defined,run job in a conda/mamba environment", required = False)
-parser.add_argument ("--use_mamba", action = "store_true", help = "If defined,run job in a conda/mamba environment", required = False)
+parser.add_argument ("--use_singularity", action = "store_true", help = "If defined,run job within a singularity container", required = False)
+parser.add_argument ("--use_apptainer", action = "store_true", help = "If defined,run job within a apptainer container", required = False)
+parser.add_argument ("--use_conda", action = "store_true", help = "If defined,run job in a conda environment", required = False)
+parser.add_argument ("--use_mamba", action = "store_true", help = "If defined,run job in a mamba environment", required = False)
 parser.add_argument ("--mode", type = str, help = "Execute snakemake rule with local or cluster(currently,only slurm supported) environment", required = True, choices = ["local", "cluster"])
 args = parser.parse_args ()
 
