@@ -35,22 +35,24 @@ contrasts.txt:case_name\tcontrol_name
 ## get template
 view help documentation by execute `python get_template.py -h`
 ```shell
-usage: get_template.py [-h] [--use_singularity] [--use_apptainer] [--use_conda]
-                       [--use_mamba] --mode {local,cluster}
+usage: get_template.py [-h] [--use_singularity] [--use_apptainer]
+                       [--use_conda] [--use_mamba] --mode
+                       {local,cluster}
 
 help document
 
 options:
   -h, --help            show this help message and exit
-  --use_singularity     If defined,run job within a apptainer/singularity
+  --use_singularity     If defined,run job within a singularity
                         container
-  --use_apptainer       If defined,run job within a apptainer/singularity
+  --use_apptainer       If defined,run job within a apptainer
                         container
-  --use_conda           If defined,run job in a conda/mamba environment
-  --use_mamba           If defined,run job in a conda/mamba environment
+  --use_conda           If defined,run job in a conda environment
+  --use_mamba           If defined,run job in a mamba environment
   --mode {local,cluster}
                         Execute snakemake rule with local or
-                        cluster(currently,only slurm supported) environment
+                        cluster(currently,only slurm supported)
+                        environment
 ```
 and then,run program
 ```shell
